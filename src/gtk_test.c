@@ -106,11 +106,35 @@ window_paste (GSimpleAction *action,
 
 }
 
+
+/*
+ * Отрыть файл управления.
+ */
+static void window_open(GSimpleAction *action,
+		 GVariant      *parameter,
+		 gpointer       user_data)
+{
+	g_print("win.OPEN.");
+}
+
+/**
+ * Запустить файл на выполнение.
+ */
+static void window_run(GSimpleAction *action,
+		 GVariant      *parameter,
+		 gpointer       user_data)
+{
+	g_print("win.RUN");
+}
+
+
 static GActionEntry win_entries[] = {
   { "copy", window_copy, NULL, NULL, NULL },
   { "paste", window_paste, NULL, NULL, NULL },
   { "fullscreen", activate_toggle, NULL, "false", change_fullscreen_state },
-  { "justify", activate_radio, "s", "'left'", change_justify_state }
+  { "justify", activate_radio, "s", "'left'", change_justify_state },
+  { "open", window_open, NULL, NULL, NULL },
+  { "run", window_run, NULL, NULL, NULL }
 };
 
 static void
@@ -260,6 +284,8 @@ static void
 bloat_pad_startup (GApplication *application)
 {
   GtkBuilder *builder;
+  GError *builder_error = NULL;
+  guint builder_code;
 
   G_APPLICATION_CLASS (bloat_pad_parent_class)
     ->startup (application);
@@ -267,58 +293,15 @@ bloat_pad_startup (GApplication *application)
   g_action_map_add_action_entries (G_ACTION_MAP (application), app_entries, G_N_ELEMENTS (app_entries), application);
 
   builder = gtk_builder_new ();
-  gtk_builder_add_from_string (builder,
-                               "<interface>"
-                               "  <menu id='app-menu'>"
-                               "    <section>"
-                               "      <item>"
-                               "        <attribute name='label' translatable='yes'>_New Window</attribute>"
-                               "        <attribute name='action'>app.new</attribute>"
-                               "        <attribute name='accel'>&lt;Primary&gt;n</attribute>"
-                               "      </item>"
-                               "    </section>"
-                               "    <section>"
-                               "      <item>"
-                               "        <attribute name='label' translatable='yes'>_About Bloatpad</attribute>"
-                               "        <attribute name='action'>app.about</attribute>"
-                               "      </item>"
-                               "    </section>"
-                               "    <section>"
-                               "      <item>"
-                               "        <attribute name='label' translatable='yes'>_Quit</attribute>"
-                               "        <attribute name='action'>app.quit</attribute>"
-                               "        <attribute name='accel'>&lt;Primary&gt;q</attribute>"
-                               "      </item>"
-                               "    </section>"
-                               "  </menu>"
-                               "  <menu id='menubar'>"
-                               "    <submenu>"
-                               "      <attribute name='label' translatable='yes'>_Edit</attribute>"
-                               "      <section>"
-                               "        <item>"
-                               "          <attribute name='label' translatable='yes'>_Copy</attribute>"
-                               "          <attribute name='action'>win.copy</attribute>"
-                               "          <attribute name='accel'>&lt;Primary&gt;c</attribute>"
-                               "        </item>"
-                               "        <item>"
-                               "          <attribute name='label' translatable='yes'>_Parse</attribute>"
-                               "          <attribute name='action'>win.parse</attribute>"
-                               "          <attribute name='accel'>&lt;Primary&gt;v</attribute>"
-                               "        </item>"
-                               "      </section>"
-                               "    </submenu>"
-                               "    <submenu>"
-                               "      <attribute name='label' translatable='yes'>_View</attribute>"
-                               "      <section>"
-                               "        <item>"
-                               "          <attribute name='label' translatable='yes'>_Fullscreen</attribute>"
-                               "          <attribute name='action'>win.fullscreen</attribute>"
-                               "          <attribute name='accel'>F11</attribute>"
-                               "        </item>"
-                               "      </section>"
-                               "    </submenu>"
-                               "  </menu>"
-                               "</interface>", -1, NULL);
+  builder_code =  gtk_builder_add_from_file (builder, "m_menu.ui", &builder_error);
+  if(!builder_code){
+//	  g_print("error:builder fault. %s",builder_error->message);
+	  g_error ("String#44 %s", builder_error->message);
+	  g_error_free (builder_error);
+	  return;
+  }
+
+
   gtk_application_set_app_menu (GTK_APPLICATION (application), G_MENU_MODEL (gtk_builder_get_object (builder, "app-menu")));
   gtk_application_set_menubar (GTK_APPLICATION (application), G_MENU_MODEL (gtk_builder_get_object (builder, "menubar")));
   g_object_unref (builder);
@@ -348,7 +331,7 @@ bloat_pad_new (void)
 {
   GtkApplication *bloat_pad;
 
-  g_type_init ();
+//  g_type_init ();
 
   g_set_application_name ("Bloatpad");
 
