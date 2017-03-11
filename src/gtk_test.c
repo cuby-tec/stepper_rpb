@@ -16,6 +16,7 @@
 #ifdef GTkapplication
 #include <stdlib.h>
 #include <gtk/gtk.h>
+#include <stdio.h>
 
 static void
 activate_toggle (GSimpleAction *action,
@@ -114,7 +115,34 @@ static void window_open(GSimpleAction *action,
 		 GVariant      *parameter,
 		 gpointer       user_data)
 {
-	g_print("win.OPEN.");
+//	g_print("win.OPEN.");
+	char *filename;
+	FILE *pfile;
+	GtkWidget *dialog;
+//parent_window
+	dialog = gtk_file_chooser_dialog_new ("Open File",
+	                                      NULL ,
+	                                      GTK_FILE_CHOOSER_ACTION_OPEN,
+	                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+	                                      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+	                                      NULL);
+
+	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+	  {
+
+	    filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+//	    open_file (filename);
+	    pfile = fopen(filename,"r");
+	    if(pfile!=NULL){
+	    	g_print("File opened:%s \n",filename);
+	    	fclose(pfile);
+	    }
+
+	    g_print("File closed:%s \n",filename);
+	    g_free (filename);
+	  }
+
+	gtk_widget_destroy (dialog);
 }
 
 /**
