@@ -33,8 +33,8 @@ void makeSettings(void){
 
 //	setting1 = gtk_notebook_new();
 //	 gtk_widget_show_all(setting1);
-//http://stackoverflow.com/questions/37405202/gtknotebook-does-not-show-tab-label-content
 
+//http://stackoverflow.com/questions/37405202/gtknotebook-does-not-show-tab-label-content
     GtkWidget* window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     GtkWidget* notebook = gtk_notebook_new();
     GtkWidget* page_content = gtk_label_new("Content");
