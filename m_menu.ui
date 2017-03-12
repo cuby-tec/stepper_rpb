@@ -62,6 +62,9 @@
 					<attribute name="label" translatable="yes">_Run</attribute>
 					<attribute name="action">win.run</attribute>
 				</item>
+				<item>
+					<attribute name="label" translatable="yes">_Settings</attribute>
+					<attribute name="action">win.settings</attribute></item>
 			</section>
 		</submenu>
 	</menu>

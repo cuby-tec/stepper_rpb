@@ -18,6 +18,9 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 
+#include "settingsWindowgroup.h"
+
+
 static void
 activate_toggle (GSimpleAction *action,
                  GVariant      *parameter,
@@ -155,6 +158,13 @@ static void window_run(GSimpleAction *action,
 	g_print("win.RUN");
 }
 
+void window_settings(GSimpleAction *action,
+		 GVariant      *parameter,
+		 gpointer       user_data)
+{
+//	g_print("win.settings");
+	makeSettings();
+}
 
 static GActionEntry win_entries[] = {
   { "copy", window_copy, NULL, NULL, NULL },
@@ -162,7 +172,8 @@ static GActionEntry win_entries[] = {
   { "fullscreen", activate_toggle, NULL, "false", change_fullscreen_state },
   { "justify", activate_radio, "s", "'left'", change_justify_state },
   { "open", window_open, NULL, NULL, NULL },
-  { "run", window_run, NULL, NULL, NULL }
+  { "run", window_run, NULL, NULL, NULL },
+  { "settings", window_settings, NULL, NULL, NULL }
 };
 
 static void
