@@ -53,10 +53,38 @@ void makeSettings(void){
 
     gtk_widget_show_all(GTK_WIDGET(window));
 
-
-
-
-
 	//g_free (settingGroup);
 }
+
+
+/**
+ * Заполнить окно "Редактором установок".
+ */
+void
+includeSettings( GtkWidget *window)
+{
+	GtkBuilder *builder;
+	GError *err = NULL;
+	GtkWidget *grid1;
+
+	builder = gtk_builder_new ();
+
+	gtk_builder_add_from_file(builder,"settings_stack.ui",&err);
+	if (err)
+	{
+		g_error ("ERROR: %s\n", err->message);
+		return ;
+	}
+
+	gtk_builder_connect_signals (builder, NULL);
+
+	grid1 = GTK_WIDGET (gtk_builder_get_object (builder, "grid1"));
+
+//	gtk_container_add (GTK_CONTAINER (window), grid1);
+	gtk_grid_attach(GTK_GRID(window),grid1,0,1,2,1);
+
+//	g_free(builder);
+
+}
+
 

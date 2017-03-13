@@ -222,7 +222,7 @@ new_window (GApplication *app,
   gtk_container_add (GTK_CONTAINER (toolbar), GTK_WIDGET (button));
 
   gtk_grid_attach (GTK_GRID (grid), toolbar, 0, 0, 1, 1);
-
+/* //
   scrolled = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_set_hexpand (scrolled, TRUE);
   gtk_widget_set_vexpand (scrolled, TRUE);
@@ -248,7 +248,8 @@ new_window (GApplication *app,
           g_free (contents);
         }
     }
-
+*/
+  includeSettings(grid);
   gtk_widget_show_all (GTK_WIDGET (window));
 }
 
