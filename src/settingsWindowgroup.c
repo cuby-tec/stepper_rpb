@@ -82,7 +82,12 @@ includeSettings( GtkWidget *window)
 
 	gtk_box_pack_start(GTK_BOX( child ),grid1,FALSE,FALSE,1);
 
-	g_free(builder);
+
+	/*
+	 *  env MALLOC_CHECK_=2 ./Debug/gtk_test
+	 *  Abort
+	 */
+//	g_free(builder);
 
 
 
