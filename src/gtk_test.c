@@ -20,6 +20,12 @@
 
 #include "settingsWindowgroup.h"
 
+// - Vars
+GtkWidget *window;
+GtkWidget *box;
+
+
+//------------ functions
 
 static void
 activate_toggle (GSimpleAction *action,
@@ -163,7 +169,8 @@ void window_settings(GSimpleAction *action,
 		 gpointer       user_data)
 {
 //	g_print("win.settings");
-	makeSettings();
+//	makeSettings();
+	includeSettings(window);
 }
 
 static GActionEntry win_entries[] = {
@@ -176,11 +183,13 @@ static GActionEntry win_entries[] = {
   { "settings", window_settings, NULL, NULL, NULL }
 };
 
+
+
 static void
 new_window (GApplication *app,
             GFile        *file)
 {
-  GtkWidget *window, *grid, *scrolled, *view;
+  GtkWidget  *grid, *scrolled, *view;
   GtkWidget *toolbar;
   GtkToolItem *button;
   GtkWidget *sw, *box, *label;
@@ -190,66 +199,14 @@ new_window (GApplication *app,
   g_action_map_add_action_entries (G_ACTION_MAP (window), win_entries, G_N_ELEMENTS (win_entries), window);
   gtk_window_set_title (GTK_WINDOW (window), "Bloatpad");
 
-  grid = gtk_grid_new ();
-  gtk_container_add (GTK_CONTAINER (window), grid);
+  box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,1);
+  gtk_container_add (GTK_CONTAINER (window), box);
 
-  toolbar = gtk_toolbar_new ();
-  button = gtk_toggle_tool_button_new_from_stock (GTK_STOCK_JUSTIFY_LEFT);
-  gtk_actionable_set_detailed_action_name (GTK_ACTIONABLE (button), "win.justify::left");
-  gtk_container_add (GTK_CONTAINER (toolbar), GTK_WIDGET (button));
+//  includeStartPage(window);
 
-  button = gtk_toggle_tool_button_new_from_stock (GTK_STOCK_JUSTIFY_CENTER);
-  gtk_actionable_set_detailed_action_name (GTK_ACTIONABLE (button), "win.justify::center");
-  gtk_container_add (GTK_CONTAINER (toolbar), GTK_WIDGET (button));
+//  includeSettings(window);
 
-  button = gtk_toggle_tool_button_new_from_stock (GTK_STOCK_JUSTIFY_RIGHT);
-  gtk_actionable_set_detailed_action_name (GTK_ACTIONABLE (button), "win.justify::right");
-  gtk_container_add (GTK_CONTAINER (toolbar), GTK_WIDGET (button));
 
-  button = gtk_separator_tool_item_new ();
-  gtk_separator_tool_item_set_draw (GTK_SEPARATOR_TOOL_ITEM (button), FALSE);
-  gtk_tool_item_set_expand (GTK_TOOL_ITEM (button), TRUE);
-  gtk_container_add (GTK_CONTAINER (toolbar), GTK_WIDGET (button));
-
-  button = gtk_tool_item_new ();
-  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
-  gtk_container_add (GTK_CONTAINER (button), box);
-  label = gtk_label_new ("Fullscreen:");
-  gtk_container_add (GTK_CONTAINER (box), label);
-  sw = gtk_switch_new ();
-  gtk_actionable_set_action_name (GTK_ACTIONABLE (sw), "win.fullscreen");
-  gtk_container_add (GTK_CONTAINER (box), sw);
-  gtk_container_add (GTK_CONTAINER (toolbar), GTK_WIDGET (button));
-
-  gtk_grid_attach (GTK_GRID (grid), toolbar, 0, 0, 1, 1);
-/* //
-  scrolled = gtk_scrolled_window_new (NULL, NULL);
-  gtk_widget_set_hexpand (scrolled, TRUE);
-  gtk_widget_set_vexpand (scrolled, TRUE);
-  view = gtk_text_view_new ();
-
-  g_object_set_data ((GObject*)window, "bloatpad-text", view);
-
-  gtk_container_add (GTK_CONTAINER (scrolled), view);
-
-  gtk_grid_attach (GTK_GRID (grid), scrolled, 0, 1, 1, 1);
-
-  if (file != NULL)
-    {
-      gchar *contents;
-      gsize length;
-
-      if (g_file_load_contents (file, NULL, &contents, &length, NULL, NULL))
-        {
-          GtkTextBuffer *buffer;
-
-          buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
-          gtk_text_buffer_set_text (buffer, contents, length);
-          g_free (contents);
-        }
-    }
-*/
-  includeSettings(grid);
   gtk_widget_show_all (GTK_WIDGET (window));
 }
 

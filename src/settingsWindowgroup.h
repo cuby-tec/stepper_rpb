@@ -14,4 +14,9 @@
 
 void makeSettings(void);
 
+/*
+ * Вывод начальной страницы приложения.
+ */
+void includeStartPage(GtkWidget *window);
+
 #endif /* SETTINGSWINDOWGROUP_H_ */

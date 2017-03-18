@@ -10,31 +10,13 @@
 
 static GtkWindowGroup *settingGroup;
 
-static GtkWidget	*setting1;
+//static GtkWidget	*setting1;
 
 
 void makeSettings(void){
-	g_print("win.settings");
+//	g_print("win.settings");
 	settingGroup = gtk_window_group_new();
 
-//	setting1 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-/*
-	setting1 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_group_add_window(settingGroup, (GtkWindow*)setting1);
-	gtk_window_set_title((GtkWindow*)setting1,"Settings");
-	gtk_window_set_destroy_with_parent((GtkWindow*)setting1,TRUE);
-	gtk_window_set_gravity (setting1,GDK_GRAVITY_NORTH_WEST);
-
-
-	gtk_window_set_modal(setting1,TRUE);
-*/
-
-//	setting1 = gtk_dialog_new();
-
-//	setting1 = gtk_notebook_new();
-//	 gtk_widget_show_all(setting1);
-
-//http://stackoverflow.com/questions/37405202/gtknotebook-does-not-show-tab-label-content
     GtkWidget* window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     GtkWidget* notebook = gtk_notebook_new();
     GtkWidget* page_content = gtk_label_new("Content");
@@ -57,6 +39,7 @@ void makeSettings(void){
 }
 
 
+
 /**
  * Заполнить окно "Редактором установок".
  */
@@ -66,6 +49,19 @@ includeSettings( GtkWidget *window)
 	GtkBuilder *builder;
 	GError *err = NULL;
 	GtkWidget *grid1;
+
+//	GtkWidget *box;
+
+	GtkWidget *child;
+	child = gtk_bin_get_child (GTK_BIN( window));
+
+//	box = gtk_box_new(GTK_ORIENTATION_VERTICAL,1);
+
+
+
+
+
+//	cu_clearWindow(window);
 
 	builder = gtk_builder_new ();
 
@@ -81,10 +77,100 @@ includeSettings( GtkWidget *window)
 	grid1 = GTK_WIDGET (gtk_builder_get_object (builder, "grid1"));
 
 //	gtk_container_add (GTK_CONTAINER (window), grid1);
-	gtk_grid_attach(GTK_GRID(window),grid1,0,1,2,1);
+//	gtk_grid_attach(GTK_GRID(window),grid1,0,1,2,1);
 
-//	g_free(builder);
+
+	gtk_box_pack_start(GTK_BOX( child ),grid1,FALSE,FALSE,1);
+
+	g_free(builder);
+
+
+
 
 }
 
+/**
+ * Заглавная страница
+ */
+#define _START_GRID
+void
+includeStartPage(GtkWidget *window)
+{
+	GtkWidget  *grid;
+	GtkWidget *toolbar;
+	GtkToolItem *button;
+	GtkWidget *sw, *box, *label;
+
+/*
+	GList *list = gtk_container_get_children (GTK_CONTAINER (window));
+	if(g_list_length(list)){
+		gtk_container_remove(GTK_CONTAINER (window),GTK_WIDGET(list->data));
+	}
+*/
+//	cu_clearWindow(window);
+
+	  /* Compose start window. */
+	#ifdef _START_GRID
+	  grid = gtk_grid_new ();
+	  gtk_container_add (GTK_CONTAINER (window), grid);
+
+	  toolbar = gtk_toolbar_new ();
+	  button = gtk_toggle_tool_button_new_from_stock (GTK_STOCK_JUSTIFY_LEFT);
+	  gtk_actionable_set_detailed_action_name (GTK_ACTIONABLE (button), "win.justify::left");
+	  gtk_container_add (GTK_CONTAINER (toolbar), GTK_WIDGET (button));
+
+	  button = gtk_toggle_tool_button_new_from_stock (GTK_STOCK_JUSTIFY_CENTER);
+	  gtk_actionable_set_detailed_action_name (GTK_ACTIONABLE (button), "win.justify::center");
+	  gtk_container_add (GTK_CONTAINER (toolbar), GTK_WIDGET (button));
+
+	  button = gtk_toggle_tool_button_new_from_stock (GTK_STOCK_JUSTIFY_RIGHT);
+	  gtk_actionable_set_detailed_action_name (GTK_ACTIONABLE (button), "win.justify::right");
+	  gtk_container_add (GTK_CONTAINER (toolbar), GTK_WIDGET (button));
+
+	  button = gtk_separator_tool_item_new ();
+	  gtk_separator_tool_item_set_draw (GTK_SEPARATOR_TOOL_ITEM (button), FALSE);
+	  gtk_tool_item_set_expand (GTK_TOOL_ITEM (button), TRUE);
+	  gtk_container_add (GTK_CONTAINER (toolbar), GTK_WIDGET (button));
+
+	  button = gtk_tool_item_new ();
+	  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+	  gtk_container_add (GTK_CONTAINER (button), box);
+	  label = gtk_label_new ("Fullscreen:");
+	  gtk_container_add (GTK_CONTAINER (box), label);
+	  sw = gtk_switch_new ();
+	  gtk_actionable_set_action_name (GTK_ACTIONABLE (sw), "win.fullscreen");
+	  gtk_container_add (GTK_CONTAINER (box), sw);
+	  gtk_container_add (GTK_CONTAINER (toolbar), GTK_WIDGET (button));
+
+	  gtk_grid_attach (GTK_GRID (grid), toolbar, 0, 0, 1, 1);
+	/* //
+	  scrolled = gtk_scrolled_window_new (NULL, NULL);
+	  gtk_widget_set_hexpand (scrolled, TRUE);
+	  gtk_widget_set_vexpand (scrolled, TRUE);
+	  view = gtk_text_view_new ();
+
+	  g_object_set_data ((GObject*)window, "bloatpad-text", view);
+
+	  gtk_container_add (GTK_CONTAINER (scrolled), view);
+
+	  gtk_grid_attach (GTK_GRID (grid), scrolled, 0, 1, 1, 1);
+
+	  if (file != NULL)
+	    {
+	      gchar *contents;
+	      gsize length;
+
+	      if (g_file_load_contents (file, NULL, &contents, &length, NULL, NULL))
+	        {
+	          GtkTextBuffer *buffer;
+
+	          buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+	          gtk_text_buffer_set_text (buffer, contents, length);
+	          g_free (contents);
+	        }
+	    }
+	*/
+	#endif
+
+}
 
