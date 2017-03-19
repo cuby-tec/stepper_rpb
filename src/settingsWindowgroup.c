@@ -6,7 +6,7 @@
  */
 
 #include "settingsWindowgroup.h"
-
+#include "profile/profile.h"
 
 static GtkWindowGroup *settingGroup;
 
@@ -38,7 +38,9 @@ void makeSettings(void){
 	//g_free (settingGroup);
 }
 
-
+static void _init_profile(){
+	init_profile();
+}
 
 /**
  * Заполнить окно "Редактором установок".
@@ -78,6 +80,9 @@ includeSettings( GtkWidget *window)
 
 //	gtk_container_add (GTK_CONTAINER (window), grid1);
 //	gtk_grid_attach(GTK_GRID(window),grid1,0,1,2,1);
+
+
+	_init_profile();
 
 
 	gtk_box_pack_start(GTK_BOX( child ),grid1,FALSE,FALSE,1);
