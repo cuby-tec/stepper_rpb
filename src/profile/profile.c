@@ -141,12 +141,14 @@ _deserialize(void)
 	rvalue = json_parse_file_with_comments("test.txt");
 
 
-	value = json_parse_string("{\"emails\":\"\"}");
+//	value = json_parse_string("{\"emails\":\"\"}");
 
 //	array = json_value_get_array();
-	array = json_object_get_array(root_value,"emails");
+//	array = json_object_get_array(root_value,"emails");
 
-	result = json_array_get_count(array);
+//	result = json_array_get_count(array);
+
+
 
 	return result;
 }
