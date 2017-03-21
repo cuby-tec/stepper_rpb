@@ -62,7 +62,7 @@ static JSON_Free_Function parson_free = free;
 #define IS_CONT(b) (((unsigned char)(b) & 0xC0) == 0x80) /* is utf-8 continuation byte */
 
 /* Type definitions */
-typedef union json_value_value {
+/*typedef union json_value_value {
     char        *string;
     double       number;
     JSON_Object *object;
@@ -90,7 +90,7 @@ struct json_array_t {
     JSON_Value **items;
     size_t       count;
     size_t       capacity;
-};
+};*/
 
 /* Various */
 static char * read_file(const char *filename);
@@ -407,13 +407,17 @@ static JSON_Status json_object_resize(JSON_Object *object, size_t new_capacity) 
 
 static JSON_Value * json_object_nget_value(const JSON_Object *object, const char *name, size_t n) {
     size_t i, name_length;
+
+    JSON_Value* result;
+
     for (i = 0; i < json_object_get_count(object); i++) {
         name_length = strlen(object->names[i]);
         if (name_length != n) {
             continue;
         }
         if (strncmp(object->names[i], name, n) == 0) {
-            return object->values[i];
+        	result = object->values[i];
+            return result;
         }
     }
     return NULL;
@@ -1081,10 +1085,12 @@ JSON_Value * json_parse_string_with_comments(const char *string) {
 /* JSON Object API */
 
 JSON_Value * json_object_get_value(const JSON_Object *object, const char *name) {
+	JSON_Value *result;
     if (object == NULL || name == NULL) {
         return NULL;
     }
-    return json_object_nget_value(object, name, strlen(name));
+    result = json_object_nget_value(object, name, strlen(name));
+    return result;
 }
 
 const char * json_object_get_string(const JSON_Object *object, const char *name) {
@@ -1100,7 +1106,8 @@ JSON_Object * json_object_get_object(const JSON_Object *object, const char *name
 }
 
 JSON_Array * json_object_get_array(const JSON_Object *object, const char *name) {
-    return json_value_get_array(json_object_get_value(object, name));
+	JSON_Array *result = json_value_get_array(json_object_get_value(object, name));
+    return result;
 }
 
 int json_object_get_boolean(const JSON_Object *object, const char *name) {
