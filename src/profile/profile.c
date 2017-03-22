@@ -35,8 +35,39 @@ static char *serialized_string = NULL;
 
 //------------------- Functions
 
+// Проверка загрузки
+static void
+_check_root_value(){
+	char *serialized_string = NULL;
 
-void load_profile(void){
+	serialized_string = json_serialize_to_string_pretty(root_value);
+
+
+	puts("========");
+	puts(serialized_string);
+
+	json_free_serialized_string(serialized_string);
+
+}
+
+
+/**
+ * Загрузка файла профилей.
+ */
+static int
+_load_profile(void){
+
+	int result=0;
+
+	char  path[128] = {NULL};
+
+	strcat(path,profile_file_name);
+
+	root_value = json_parse_file_with_comments(path);
+
+//	_check_root_value();
+
+	return (root_value==NULL?0:1);
 
 }
 
@@ -119,11 +150,11 @@ write_str(char* str){
 /***
  * Создать профиль по-умолчанию.
  */
-void
-create_profile(void)
+static void
+_create_profile(FILE *fp)
 {
-	JSON_Value *root_value = json_value_init_object();
-	JSON_Object *root_object = json_value_get_object(root_value);
+//	JSON_Value *root_value = json_value_init_object();
+//	JSON_Object *root_object = json_value_get_object(root_value);
 	JSON_Array *root_array;
 
 	char *serialized_string = NULL;
@@ -131,8 +162,10 @@ create_profile(void)
 	char* path = "profiles";
 
 	char *prof1 = "[]";
-	char* prof3 = "{\"profile1\":{\"name\": \"email@example.com\",\"name1\": \"email2@example.com\"}}";
-	char* prof4 = "{\"profile2\":{\"name\": \"email@example.com\",\"name1\": \"email2@example.com\"}}";
+	char* prof3 = "{\"profile1\":{\"name\": \"profile1\",\"description\": \"Reprap mendel with X,Y axes by belt, Z axe with two shafts. Extruder.\","
+			"\"file\": \"profile1.json\",\"default\" : true}}";
+	char* prof4 = "{\"profile2\":{\"profile2\": \"profile2\",\"description\": \"Reprap mendel with X,Y axes by belt, Z axe with two shafts. Extruder.\","
+			"\"file\":\"profile2.json\",\"default\" : false}}";
 
 	json_object_set_value(root_object,path,json_parse_string(prof1));
 
@@ -142,20 +175,38 @@ create_profile(void)
 
 	serialized_string = json_serialize_to_string_pretty(root_value);
 
+	fputs(serialized_string,fp);
+
 	puts("========");
 	puts(serialized_string);
 
 	json_free_serialized_string(serialized_string);
 
-	json_value_free(root_value);
+//	json_value_free(root_value);
 }
 
 
-/**
- * Загрузка файла профилей.
- */
+
+
 static int
 _deserialize(void)
+{
+	int result=0;
+
+	char  path[128] = {NULL};
+
+	strcat(path,profile_file_name);
+
+	root_value = json_parse_file_with_comments(path);
+
+
+
+	return (result);
+}
+
+
+static int
+_deserialize1(void)
 {
 	char  filename[128] = {NULL};
 
@@ -190,14 +241,6 @@ JSON_Array *arr3 = json_value_get_array(rvalue);
 
 	JSON_Array* arr5 = json_object_dotget_array(object,"contact.emails");
 
-/*
-	JSON_Array *arr4 = json_object_get_array(object,_name2);
-	JSON_Object *obj1 = json_object_get_object(object,_name);
-//	JSON_Object *obj2 = json_object_get_object(object,_name2);
-//	json_object_get_array
-	JSON_Array	*varray = json_object_get_array(obj1,_name2);// та да !
-	JSON_Object *eml;
-*/
 
 //	result = json_array_get_count(array);
 	for(i=0;i<json_array_get_count(arr5);i++){
@@ -212,6 +255,8 @@ JSON_Array *arr3 = json_value_get_array(rvalue);
 
 /**
  * Создать переменные и загрузить файл Профилей.
+ * Проверка наличия файла профиля и его правильность или
+ * создать новый профиль профиль по-умолчанию.
  */
 void init_profile(void){
 
@@ -219,37 +264,40 @@ void init_profile(void){
 
 	FILE *fp;
 
-	struct profile_t * _profile;
+//	struct profile_t * _profile;
 
-
-	_profile = (struct profile_t*)malloc(sizeof(struct profile_t));
+//	_profile = (struct profile_t*)malloc(sizeof(struct profile_t));
 
 	strcat(filename,profile_file_name);
-
-
-	if(_check_profile_file_existence()){
-		fp = fopen(filename, "w+");
-		printf("file %s created.\n",filename);
-	}else{
-		fp = fopen(filename, "r+");
-		printf("file %s opened.\n", filename);
-	}
 
 	root_value = json_value_init_object();
 	root_object = json_value_get_object(root_value);
 
+	if(_check_profile_file_existence()){
+		fp = fopen(filename, "w+");
 
-	create_profile();
+		_create_profile(fp);
 
-	_serialization_example(fp);
+		fclose(fp);
 
-	fclose(fp);
+		printf("file %s created.\n",filename);
+	}else{
+//		fp = fopen(filename, "r+");
+		printf("file %s exist.\n", filename);
+		_load_profile();
+	}
 
 
-	_deserialize();
 
 
-	free(_profile);
+//	_serialization_example(fp);
+
+
+
+//	_deserialize();
+
+
+//	free(_profile);
 
 }
 
