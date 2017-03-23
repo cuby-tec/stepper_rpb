@@ -29,7 +29,7 @@
 							<!-- row1 -->
 							<child>
 								<object class="GtkLabel" id="profilecombolabel">
-									<property name="label" >Profiles</property>
+									<property name="label" translatable="yes">Profiles</property>
 									<property name="visible">True</property>
 									<property name="margin-top">10</property>
 								</object>
@@ -57,7 +57,7 @@
 							<!-- row2 -->
 							<child>
 								<object class="GtkLabel" id="profilenameEntrylabel">
-									<property name="label" >Name</property>
+									<property name="label" translatable="yes">Name</property>
 									<property name="visible">True</property>
 									<property name="margin-top">10</property>
 								</object>
@@ -76,8 +76,35 @@
 									<property name="top_attach">2</property>
 								</packing>
 							</child>
-								<child>
-									<object class="GtkComboBoxText" id="pf2">
+							<!-- row 3 -->
+							<child>
+								<object class="GtkLabel" id="profileDescEntrylabel">
+									<property name="label" translatable="yes">Description</property>
+									<property name="visible">True</property>
+									<property name="margin-top">10</property>
+								</object>
+								<packing>
+									<property name="left_attach">0</property>
+									<property name="top_attach">3</property>
+								</packing>
+							</child>
+							<child>
+								
+								<object class="GtkTextView" id="profiledescription">
+									<property name="visible">True</property>
+									<property name="height-request">90</property>
+									<property name="width-request">300</property>
+									
+								</object>
+								<packing>
+									<property name="left_attach">1</property>
+									<property name="top_attach">3</property>
+									<property name="width">2</property>
+								</packing>
+							</child>
+							<!-- row 4 -->
+						<!-- 	<child>
+								<object class="GtkComboBoxText" id="pf2">
 									<property name="visible">True</property>
 										<items>
 											<item id="prof1">Prof1</item>
@@ -87,26 +114,27 @@
 									<property name="left_attach">1</property>
 									<property name="top_attach">4</property>
 									</packing>
-								</child>
-								<child>
-									<object class="GtkImage" id="image1">
+							</child> -->
+							<child>
+								<object class="GtkImage" id="image1">
 									<property name="visible">True</property>
 									<property name="can_focus">False</property>
 									<property name="margin-top">20</property>
 									<property name="margin-bottom">20</property>
 									<property name="file">gtk-logo-48.png</property>
-									</object>
-									<packing>
-										<property name="left_attach">0</property>
-										<property name="top_attach">3</property>
-									</packing>
+								</object>
+								<packing>
+									<property name="left_attach">0</property>
+									<property name="top_attach">4</property>
+									<property name="height">2</property>
+								</packing>
 								
-								</child>
+							</child>
 							</object>
 <!-- 								<property name="resource">/application/gtk-logo-48.png</property> -->
 							<packing>
 								<property name="name">page1</property>
-								<property name="title" translatable="yes">Page 1</property>
+								<property name="title" translatable="yes">Profile</property>
 							</packing>
 							<!-- page 1 end -->
 						</child>
