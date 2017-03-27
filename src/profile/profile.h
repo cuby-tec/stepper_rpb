@@ -10,17 +10,21 @@
 
 #include "Settings.h"
 
-
+#include "Profile_Names.h"
 
 //---------- defs
 
 
 struct profile_t{
-	char name[128];
-	char description[1024];
-	char filename[128];
+	char name[PRFL_NAME_SIZE];
+	char description[PRFL_DESCRIPTION_SIZE];
+	char filename[PRFL_NAME_SIZE];
 	struct Settings *settings;
 };
+
+
+
+
 
 // -------- vars
 

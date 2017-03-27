@@ -20,10 +20,26 @@
 
 //-----------------  Vars
 
+//profile1
+static const char* profileName_1 = "Profile1";
+
+//Reprap mendel with X,Y axes by belt, Z axe with two shafts. Extruder.
+static const char* profiledDescription_1 = "Profile with 5 axes[X,Y,Z(2),E.]";
+//profile2.json
+static const char* profileFilename_1 = "profile1.prf";
+
+//static const char* _default = "true"
+
+static JSON_Array *root_array;
+
+
+
+//-------------------
+
 static struct profile_t * _profile;
 
 
-static const char* profile_file_name = "profile.json";
+static const char* profile_file_name = "profiles.json";	// Список профилей
 static const char* profile_file_path = "profile";
 
 JSON_Array * jarray;
@@ -32,6 +48,10 @@ static JSON_Value *root_value;
 static JSON_Object *root_object;
 
 static char *serialized_string = NULL;
+
+
+
+
 
 //------------------- Functions
 
@@ -47,30 +67,6 @@ _check_root_value(){
 	puts(serialized_string);
 
 	json_free_serialized_string(serialized_string);
-
-}
-
-
-
-
-
-/**
- * Загрузка файла профилей.
- */
-static int
-_load_profile(void){
-
-	int result=0;
-
-	char  path[128] = {NULL};
-
-	strcat(path,profile_file_name);
-
-	root_value = json_parse_file_with_comments(path);
-
-//	_check_root_value();
-
-	return (root_value==NULL?0:1);
 
 }
 
@@ -103,7 +99,9 @@ _serialization_example(FILE* fp)
 
 }
 
-
+/**
+ * проверка наличия файла - Списка профилей.
+ */
 static int
 _check_profile_file_existence()
 {
@@ -150,6 +148,115 @@ write_str(char* str){
 //	printf("status:%d",status);
 }
 
+
+/**
+ * построение описанисателей профилей для файла - Список профилей.
+ */
+//static char* templ1 = "{\"profile1\":{\"name\":";
+//static char* templ2 = "\"description\":";
+//static char* templ3  = "\"file\":";
+
+static char* startobj = "{";
+static char* endobj = "}";
+static char* colon = ":";
+static char* comma = ",";
+
+static char* escape1 =  "\"";
+
+static char* templ_name = "name";
+static char* templ_description = "description";
+static char* templ_file = "file";
+static char* templ_default = "default";
+static char* templ_true = "true";
+static char* templ_false = "false";
+
+
+#define PROFILE_BUFFER_SiZE	1024
+
+static char buffer[PROFILE_BUFFER_SiZE];
+
+static char*_build_profile_record(int isDefault ){
+//	char result[1024] = {NULL};
+	char* result = buffer;
+
+	result[0] = 0;
+
+	strcat(result,startobj);
+	strcat(result,escape1);
+	strcat(result,profileName_1); //
+	strcat(result,escape1);
+	strcat(result,colon);
+
+	strcat(result,startobj);
+	strcat(result,escape1);
+	strcat(result,templ_name);
+	strcat(result,escape1);
+	strcat(result,colon);
+	strcat(result,escape1);
+	strcat(result,profileName_1);
+	strcat(result,escape1);
+	strcat(result,comma); // name
+
+
+	strcat(result,escape1);
+	strcat(result,templ_description);
+	strcat(result,escape1);
+	strcat(result,colon);
+	strcat(result,escape1);
+	strcat(result,profiledDescription_1);
+	strcat(result,escape1);
+	strcat(result,comma);
+	strcat(result,escape1);
+	strcat(result,templ_file);
+	strcat(result,escape1);
+	strcat(result,colon);
+	strcat(result,escape1);
+	strcat(result,profileFilename_1);
+	strcat(result,escape1);
+
+	strcat(result,comma);
+	strcat(result,escape1);
+	strcat(result,templ_default);
+	strcat(result,escape1);
+	strcat(result,colon);
+	strcat(result,escape1);
+	if(isDefault)
+		strcat(result,templ_true);
+	else
+		strcat(result,templ_false);
+	strcat(result,escape1);
+	strcat(result,endobj);
+	strcat(result,endobj);
+
+	return (buffer);
+}
+
+
+
+/**
+ * Загрузка файла профилей.
+ */
+static int
+_load_profile(void){
+
+	int result=0;
+
+	char  path[128] = {NULL};
+
+	strcat(path,profile_file_name);
+
+	root_value = json_parse_file_with_comments(path);
+
+	root_array = json_object_get_array(root_object,"profiles");
+
+//	_check_root_value();
+
+	return (root_value==NULL?0:1);
+
+}
+
+
+
 /***
  * Создать профиль по-умолчанию.
  */
@@ -158,7 +265,6 @@ _create_profile(FILE *fp)
 {
 //	JSON_Value *root_value = json_value_init_object();
 //	JSON_Object *root_object = json_value_get_object(root_value);
-	JSON_Array *root_array;
 
 	char *serialized_string = NULL;
 
@@ -166,22 +272,26 @@ _create_profile(FILE *fp)
 
 	char *prof1 = "[]";
 	char* prof3 = "{\"profile1\":{\"name\": \"profile1\",\"description\": \"Reprap mendel with X,Y axes by belt, Z axe with two shafts. Extruder.\","
-			"\"file\": \"profile1.json\",\"default\" : true}}";
+			"\"file\": \"profile1.json\",\"default\" : false}}";
+
 	char* prof4 = "{\"profile2\":{\"profile2\": \"profile2\",\"description\": \"Reprap mendel with X,Y axes by belt, Z axe with two shafts. Extruder.\","
 			"\"file\":\"profile2.json\",\"default\" : false}}";
+
+	char* prof5 = _build_profile_record(1);
 
 	json_object_set_value(root_object,path,json_parse_string(prof1));
 
 	root_array = json_object_get_array(root_object,"profiles");
 	json_array_append_value(root_array,json_parse_string(prof3));
 	json_array_append_value(root_array,json_parse_string(prof4));
+	json_array_append_value(root_array,json_parse_string(prof5));
 
 	serialized_string = json_serialize_to_string_pretty(root_value);
 
 	fputs(serialized_string,fp);
 
-	puts("========");
-	puts(serialized_string);
+//	puts("========");
+//	puts(serialized_string);
 
 	json_free_serialized_string(serialized_string);
 
@@ -289,20 +399,19 @@ void init_profile(void){
 		printf("file %s exist.\n", filename);
 		_load_profile();
 	}
-
-
-
-
 //	_serialization_example(fp);
-
-
-
 //	_deserialize();
-
-
 //	free(_profile);
-
 }
+
+
+
+prfl_StringArray*  prfl_getListPrflNames(void){
+//prfl_StringArray * prfl_names
+	return (prfl_names);
+}
+
+
 
 void
 destroy_profile(void)

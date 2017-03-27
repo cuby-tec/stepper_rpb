@@ -7,6 +7,11 @@
 
 #include "settingsWindowgroup.h"
 #include "profile/profile.h"
+//#include "gtk/gtkstack.h"
+
+
+#include "profile/profilePage1.h"
+
 
 static GtkWindowGroup *settingGroup;
 
@@ -38,8 +43,90 @@ void makeSettings(void){
 	//g_free (settingGroup);
 }
 
-static void _init_profile(){
+enum
+{
+  STRING_COLUMN,
+  INT_COLUMN,
+  N_COLUMNS
+};
+
+static void _checkcombobox(GtkComboBox *combo){
+	GtkTreeModel *list_store =   gtk_combo_box_get_model(combo);
+	GtkTreeIter iter;
+	gboolean valid;
+	gint row_count = 0;
+
+	// Get the first iter in the list, check it is valid and walk
+	// through the list, reading each row.
+	valid = gtk_tree_model_get_iter_first (list_store, &iter);
+	while (valid)
+	{
+		gchar *str_data;
+		gint   int_data;
+
+		// Make sure you terminate calls to gtk_tree_model_get() with a “-1” value
+		gtk_tree_model_get (list_store, &iter, STRING_COLUMN, &str_data, -1);
+
+		// Do something with the data
+		g_print ("Row %d: (%s)\n", row_count, str_data );
+		g_free (str_data);
+
+		valid = gtk_tree_model_iter_next (list_store, &iter);
+
+		row_count++;
+	}
+
+
+
+}
+
+/**
+ * заполнить элементы UI данными из файла профилей.
+ */
+static void _init_profile(ProfilePage1* page){
+
 	init_profile();
+
+	prfl_StringArray* array = prfl_getListPrflNames();
+
+//	page->profilecombo;
+
+//GtkTreeModel *tree =   gtk_combo_box_get_model(page->profilecombo);
+	GtkListStore *combo_list = GTK_LIST_STORE(gtk_combo_box_get_model(page->profilecombo));
+
+	/*
+	 * http://stackoverflow.com/questions/39366248/customizing-completion-of-gtkcomboboxtext
+	 *     GtkWidget *entry = gtk_bin_get_child(GTK_BIN(combobox));
+	 *     const char *prefix = gtk_entry_get_text(GTK_ENTRY(entry));
+	 *     const size_t prefix_len = (prefix) ? strlen(prefix) : 0;
+	 */
+
+
+	_checkcombobox(page->profilecombo);
+
+	GtkTreeIter iterator;
+
+    /* Clear the current store */
+    gtk_list_store_clear(combo_list);
+
+    /* Initialize the list iterator */
+    gtk_tree_model_get_iter_first(GTK_TREE_MODEL(combo_list), &iterator);
+
+    /* Find all you want to have in the combo box;
+       for each  const char *match, do:
+    */
+    gtk_list_store_append(combo_list, &iterator);
+
+
+    char* match = "example1";
+
+    /* Note that the string pointed to by match is copied;
+     *  match is not referred to after the _set() returns.
+    */
+    gtk_list_store_set(combo_list, &iterator, 0, match, -1);
+
+    _checkcombobox(page->profilecombo);
+
 }
 
 /**
@@ -51,19 +138,12 @@ includeSettings( GtkWidget *window)
 	GtkBuilder *builder;
 	GError *err = NULL;
 	GtkWidget *grid1;
+	GtkGrid *stack;
 
 //	GtkWidget *box;
 
 	GtkWidget *child;
 	child = gtk_bin_get_child (GTK_BIN( window));
-
-//	box = gtk_box_new(GTK_ORIENTATION_VERTICAL,1);
-
-
-
-
-
-//	cu_clearWindow(window);
 
 	builder = gtk_builder_new ();
 
@@ -77,25 +157,42 @@ includeSettings( GtkWidget *window)
 	gtk_builder_connect_signals (builder, NULL);
 
 	grid1 = GTK_WIDGET (gtk_builder_get_object (builder, "grid1"));
-
-//	gtk_container_add (GTK_CONTAINER (window), grid1);
-//	gtk_grid_attach(GTK_GRID(window),grid1,0,1,2,1);
+	stack = GTK_STACK(gtk_builder_get_object (builder, "gridprofile"));
 
 
-	_init_profile();
+	profilePage1->profilecombo = GTK_COMBO_BOX_TEXT(gtk_builder_get_object (builder, "profilecombo"));
+	profilePage1->profiledescription = GTK_TEXT_VIEW(gtk_builder_get_object (builder, "profiledescription"));
+	profilePage1->profilename = GTK_ENTRY(gtk_builder_get_object (builder, "profilename"));
 
+// fill Profile page with default profile data.
+	_init_profile(profilePage1);
 
 	gtk_box_pack_start(GTK_BOX( child ),grid1,FALSE,FALSE,1);
 
+	GList *list = gtk_container_get_children(GTK_CONTAINER(stack));
 
-	/*
-	 *  env MALLOC_CHECK_=2 ./Debug/gtk_test
-	 *  Abort
-	 */
-//	g_free(builder);
+//	char* cname = G_OBJECT_CLASS_NAME(GTK_CONTAINER( list->data));
+
+/*
+	GList *elem;
+	GtkWidget *wd2;
+	for(elem = list;elem;elem = elem->next){
+		wd2 = (GtkWidget*)elem->data;
+		printf("includesettings[93]:%s:name=%s\n",G_OBJECT_TYPE_NAME(wd2),G_OBJECT_TYPE_NAME(wd2));
+	}
+
+	GtkStack * stk2;
+
+*/
 
 
 
+//gtk_stack_get_child_by_name ()
+
+//	GtkWidget *wd1 = (GtkWidget *)list->data;
+
+
+//	printf("includeSettings[86]:%s\n",G_OBJECT_CLASS_NAME(wd1));
 
 }
 
