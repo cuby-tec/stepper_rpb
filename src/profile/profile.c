@@ -20,8 +20,6 @@
 
 //-----------------  Vars
 
-//profile1
-static const char* profileName_1 = "Profile1";
 
 //Reprap mendel with X,Y axes by belt, Z axe with two shafts. Extruder.
 static const char* profiledDescription_1 = "Profile with 5 axes[X,Y,Z(2),E.]";
@@ -156,19 +154,58 @@ write_str(char* str){
 //static char* templ2 = "\"description\":";
 //static char* templ3  = "\"file\":";
 
-static char* startobj = "{";
-static char* endobj = "}";
-static char* colon = ":";
-static char* comma = ",";
+const char* startobj = "{";
+const char* endobj = "}";
+const char* colon = ":";
+const char* comma = ",";
+const char* escape1 =  "\"";
+const char* templ_root_array = "[]";
 
-static char* escape1 =  "\"";
+const char* templ_root_path = "profiles";
+const char* templ_field_profile = "profile";
+const char* templ_name = "name";
+const char* templ_description = "description";
+const char* templ_file = "file";
+const char* templ_default = "default";
+const char* templ_true = "true";
+const char* templ_false = "false";
 
-static char* templ_name = "name";
-static char* templ_description = "description";
-static char* templ_file = "file";
-static char* templ_default = "default";
-static char* templ_true = "true";
-static char* templ_false = "false";
+//profile1
+static const char* profileName_1 = "Profile";
+
+
+static size_t names_counter = 0;
+
+
+
+static size_t size_buffer = 50;
+static char* name_buffer;
+
+static char*
+_new_profile_name()
+{
+//	char* number;
+//	char str[256];
+//	char buffer[size_buffer];
+
+	 int nchars;
+
+//	buffer = (char *) malloc (size);
+
+//	 if (buffer == NULL)
+//		 return NULL;
+
+
+//	strcpy(new_name,profileName_1);
+//	snprintf(str, sizeof str, "%zu", names_counter);
+	 names_counter++;
+	nchars = snprintf (name_buffer, size_buffer,"%s%zu",profileName_1,names_counter);
+
+	if(nchars < size_buffer)
+		return name_buffer;
+	else
+		return NULL;
+}
 
 
 #define PROFILE_BUFFER_SiZE	1024
@@ -183,7 +220,7 @@ static char*_build_profile_record(int isDefault ){
 
 	strcat(result,startobj);
 	strcat(result,escape1);
-	strcat(result,profileName_1); //
+	strcat(result,templ_field_profile); //
 	strcat(result,escape1);
 	strcat(result,colon);
 
@@ -193,7 +230,14 @@ static char*_build_profile_record(int isDefault ){
 	strcat(result,escape1);
 	strcat(result,colon);
 	strcat(result,escape1);
-	strcat(result,profileName_1);
+//	strcat(result,profileName_1);
+	name_buffer = (char*)malloc(size_buffer);
+	if(name_buffer){
+		strcat(result,_new_profile_name());
+		free(name_buffer);
+	}
+	else
+		return NULL;
 	strcat(result,escape1);
 	strcat(result,comma); // name
 
@@ -247,7 +291,9 @@ _load_profile(void){
 
 	root_value = json_parse_file_with_comments(path);
 
-	root_array = json_object_get_array(root_object,"profiles");
+	root_object = json_value_get_object(root_value);
+
+	root_array = json_object_get_array(root_object,templ_root_path);
 
 //	_check_root_value();
 
@@ -268,23 +314,36 @@ _create_profile(FILE *fp)
 
 	char *serialized_string = NULL;
 
-	char* path = "profiles";
 
-	char *prof1 = "[]";
-	char* prof3 = "{\"profile1\":{\"name\": \"profile1\",\"description\": \"Reprap mendel with X,Y axes by belt, Z axe with two shafts. Extruder.\","
+/*
+	char* prof3 = "{\"profile\":{\"name\": \"profile1\",\"description\": \"Reprap mendel with X,Y axes by belt, Z axe with two shafts. Extruder.\","
 			"\"file\": \"profile1.json\",\"default\" : false}}";
 
-	char* prof4 = "{\"profile2\":{\"profile2\": \"profile2\",\"description\": \"Reprap mendel with X,Y axes by belt, Z axe with two shafts. Extruder.\","
+	char* prof4 = "{\"profile\":{\"name\": \"profile2\",\"description\": \"Reprap mendel with X,Y axes by belt, Z axe with two shafts. Extruder.\","
 			"\"file\":\"profile2.json\",\"default\" : false}}";
 
 	char* prof5 = _build_profile_record(1);
+*/
+	root_object = json_value_get_object(root_value);
 
-	json_object_set_value(root_object,path,json_parse_string(prof1));
+	json_object_set_value(root_object,templ_root_path,json_parse_string(templ_root_array));
+//	root_array = json_object_get_array(root_object,"profiles");
+	root_array = json_object_get_array(root_object,templ_root_path);
 
-	root_array = json_object_get_array(root_object,"profiles");
-	json_array_append_value(root_array,json_parse_string(prof3));
-	json_array_append_value(root_array,json_parse_string(prof4));
-	json_array_append_value(root_array,json_parse_string(prof5));
+	char* prof_n;
+
+
+	prof_n = _build_profile_record(1);
+	json_array_append_value(root_array,json_parse_string(prof_n)); //prof3
+//	free(prof_n);
+
+	prof_n = _build_profile_record(0);
+	json_array_append_value(root_array,json_parse_string(prof_n));
+//	free(prof_n);
+
+	prof_n = _build_profile_record(0);
+	json_array_append_value(root_array,json_parse_string(prof_n));
+//	free(prof_n);
 
 	serialized_string = json_serialize_to_string_pretty(root_value);
 
@@ -384,7 +443,7 @@ void init_profile(void){
 	strcat(filename,profile_file_name);
 
 	root_value = json_value_init_object();
-	root_object = json_value_get_object(root_value);
+//	root_object = json_value_get_object(root_value);
 
 	if(_check_profile_file_existence()){
 		fp = fopen(filename, "w+");
@@ -396,8 +455,9 @@ void init_profile(void){
 		printf("file %s created.\n",filename);
 	}else{
 //		fp = fopen(filename, "r+");
-		printf("file %s exist.\n", filename);
-		_load_profile();
+		if( _load_profile())
+			printf("file %s exist.\n", filename);
+		//todo if profiles not loaded.
 	}
 //	_serialization_example(fp);
 //	_deserialize();
@@ -405,10 +465,26 @@ void init_profile(void){
 }
 
 
+//prfl_StringArray*
+void  prfl_getListPrflNames(prfl_StringArray* dst){
+//	prfl_StringArray * names = (prfl_StringArray*)dst;
+	// Считаем, что профиль загружен успешно.
+	size_t i;
+	JSON_Object* obj;
+	char* name;
+	// ini dst
+	prfl_init_array(dst);
+	// circle by JASON_Array
+	size_t count = json_array_get_count(root_array);
+	for(i=0;(i<count)&&(dst->index<dst->length);i++){
+		obj =  json_array_get_object(root_array,i);
+		name = json_object_dotget_string(obj,"profile.name");
+		prfl_add_element(dst,name);
+		printf("prfl_getListPrflNames[424]:%s\n",name);
+	}
 
-prfl_StringArray*  prfl_getListPrflNames(void){
-//prfl_StringArray * prfl_names
-	return (prfl_names);
+
+//	return (prfl_names);
 }
 
 

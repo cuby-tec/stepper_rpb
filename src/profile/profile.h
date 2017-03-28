@@ -41,5 +41,8 @@ void delete_profile(void);
 
 void init_profile(void);
 
+// Получить список профилей.
+void prfl_getListPrflNames(prfl_StringArray *dst);
+
 
 #endif /* PROFILE_H_ */

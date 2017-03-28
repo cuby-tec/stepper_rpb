@@ -87,12 +87,18 @@ static void _init_profile(ProfilePage1* page){
 
 	init_profile();
 
-	prfl_StringArray* array = prfl_getListPrflNames();
+	prfl_StringArray* dst;
+
+	size_t i;
+
+
+//	prfl_StringArray* array = prfl_getListPrflNames();
+//	prfl_getListPrflNames(dst);
 
 //	page->profilecombo;
 
 //GtkTreeModel *tree =   gtk_combo_box_get_model(page->profilecombo);
-	GtkListStore *combo_list = GTK_LIST_STORE(gtk_combo_box_get_model(page->profilecombo));
+	GtkListStore *combo_list = GTK_LIST_STORE(gtk_combo_box_get_model(GTK_COMBO_BOX(page->profilecombo)));
 
 	/*
 	 * http://stackoverflow.com/questions/39366248/customizing-completion-of-gtkcomboboxtext
@@ -102,7 +108,7 @@ static void _init_profile(ProfilePage1* page){
 	 */
 
 
-	_checkcombobox(page->profilecombo);
+	_checkcombobox(GTK_COMBO_BOX(page->profilecombo));
 
 	GtkTreeIter iterator;
 
@@ -125,7 +131,39 @@ static void _init_profile(ProfilePage1* page){
     */
     gtk_list_store_set(combo_list, &iterator, 0, match, -1);
 
-    _checkcombobox(page->profilecombo);
+    _checkcombobox(GTK_COMBO_BOX(page->profilecombo));
+
+    //todo Загрузить список профилей.
+//    prfl_StringArray * prf_list = prfl_getListPrflNames();
+
+
+    dst = (prfl_StringArray*)malloc(sizeof(prfl_StringArray));
+
+    prfl_getListPrflNames(dst);
+////////////////////////////////////////////////
+
+    GtkComboBoxText * combo = GTK_COMBO_BOX_TEXT(page->profilecombo);
+
+    gtk_combo_box_text_remove_all (combo);
+
+    gboolean valid;
+
+    for(i=0;i<dst->index;i++)
+    {
+    	match = dst->data[i].string;
+//    	gtk_list_store_set(combo_list, &iterator, 0, match, -1);
+
+//    	valid = gtk_tree_model_iter_next (combo_list, &iterator);
+
+
+    	gtk_combo_box_text_append_text(combo,match);
+
+    }
+
+
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo),0);
+
+    free(dst);
 
 }
 
